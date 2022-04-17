@@ -2,7 +2,7 @@ import React from "react";
 import "./UserForm.css";
 import Input from "../Input";
 import { Button } from "@mui/material";
-import { Formik, Form, ErrorMessage } from "formik";
+import { Formik, Form } from "formik";
 import * as yup from "yup";
 
 export const UserForm = () => {
@@ -10,6 +10,7 @@ export const UserForm = () => {
     name: "",
     email: "",
     phone: "",
+    avatar: "",
   };
 
   const imgTypes = ["image/jpeg", "image/png", "image/jpg"];
@@ -29,8 +30,9 @@ export const UserForm = () => {
       .required("Please, fill the field"),
     avatar: yup
       .mixed()
+      .required("Please, choose the file")
       .test("type", "Please, provide the right image type", (file) => {
-        return imgTypes.some((type) => type === file?.type);
+        return file && imgTypes.some((type) => type === file?.type);
       }),
   });
 
@@ -38,9 +40,11 @@ export const UserForm = () => {
     <Formik
       initialValues={initialValues}
       validationSchema={validationSchema}
-      onSubmit={(values) => {}}
+      onSubmit={(values) => {
+        alert("Form has submitted");
+      }}
     >
-      {({ setFieldValue, setFieldTouched, errors, touched }) => (
+      {({ setFieldValue, setFieldTouched, errors, touched, values }) => (
         <Form>
           <Input name="name" placeholder="name" />
           <Input name="email" placeholder="email" />
@@ -57,10 +61,10 @@ export const UserForm = () => {
               setFieldTouched("avatar", true, false);
             }}
           />
-          <ErrorMessage
-            name="avatar"
-            render={(msg) => <div className="error-input">{msg}</div>}
-          />
+          {console.log(errors, touched, values)}
+          {(errors.avatar && !values) || touched.avatar ? (
+            <div className="error-input">{errors.avatar}</div>
+          ) : null}
           <Button
             size="large"
             variant="outlined"
